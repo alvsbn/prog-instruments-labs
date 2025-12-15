@@ -5,9 +5,7 @@ import pygame
 from pygame import RLEACCEL, KEYDOWN
 
 
-
 pygame.init()
-
 
 size = WIDTH,HEIGHT = (600,150)
 win = pygame.display.set_mode(size)
@@ -21,13 +19,12 @@ jump_sound = pygame.mixer.Sound('sprites/jump.wav')
 die_sound = pygame.mixer.Sound('sprites/die.wav')
 checkPoint_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
 
-
-
 high_score = 0
 FPS = 60
 gravity = 0.6
 
 clock = pygame.time.Clock()
+
 
 def load_image(
     name,
@@ -48,6 +45,7 @@ def load_image(
         image = pygame.transform.scale(image, (sizex, sizey))
 
     return (image, image.get_rect())
+
 
 def load_sprite_sheet(
         sheetname,
@@ -89,6 +87,7 @@ def load_sprite_sheet(
 
     return sprites,sprite_rect
 
+
 def extractDigits(number):
     if number > -1:
         digits = []
@@ -103,6 +102,7 @@ def extractDigits(number):
         digits.reverse()
         return digits
 
+
 class Ground():
     def __init__(self,sizex=-1,sizey=-1,speed = -5):
         self.image,self.rect = load_image("ground.png",sizex,sizey,-1)
@@ -112,6 +112,7 @@ class Ground():
         self.rect.bottom = HEIGHT
         self.rect1.bottom = HEIGHT
         self.speed = speed
+
     def update(self):
         self.rect.left +=self.speed
         self.rect1.left +=self.speed
@@ -119,10 +120,12 @@ class Ground():
             self.rect.left = self.rect1.right
         elif self.rect1.right<=0:
             self.rect1.left = self.rect.right
+
     def draw(self):
         win.blit(self.image,self.rect)
         win.blit(self.image1,self.rect1)
         self.update()
+
 
 class Cloud:
     def __init__(self,x_pos,y_pos = random.randrange(0,60),speed = -2):
@@ -130,15 +133,19 @@ class Cloud:
         self.rect.left= x_pos
         self.rect.top = y_pos
         self.speed = speed
+
     def draw(self):
         win.blit(self.image ,self.rect)
+
     def update(self):
         self.rect.left +=self.speed
+
 
 def collide(obj1,obj2):
     offset_x = int(obj2.rect.left - obj1.rect.left)
     offset_y = int(obj2.rect.top - obj1.rect.top)
     return obj1.mask.overlap(obj2.mask,(offset_x,offset_y)) != None
+
 
 class Dino(pygame.sprite.Sprite):
     def __init__(self,sizex=-1,sizey=-1):
@@ -154,6 +161,7 @@ class Dino(pygame.sprite.Sprite):
         self.jumpCount = 17
         self.neg = -1
         self.mask = pygame.mask.from_surface(self.image())
+
     def update(self):
         if self.isJump:
             if self.jumpCount == 0:
@@ -166,9 +174,11 @@ class Dino(pygame.sprite.Sprite):
                 self.neg = -1
                 self.isJump = False
                 self.rect.bottom = int(0.98*HEIGHT)
+
     def draw(self):
         self.update()
         win.blit(self.image(),self.rect)
+
     def image(self):
         if self.isDead:
             return self.images[4]
@@ -200,6 +210,7 @@ class Cactus(pygame.sprite.Sprite):
         self.rect.left = WIDTH
         self.rect.bottom = int(0.98*HEIGHT)
         self.mask = pygame.mask.from_surface(self.image)
+
     def update(self):
         self.rect.left +=self.speed
 
@@ -218,6 +229,7 @@ class Cactus(pygame.sprite.Sprite):
         elif ch == 3:
             return (self.images4[random.randint(0,1)],self.rect4)
 
+
 class Ptera(pygame.sprite.Sprite):
     def __init__(self,speed =-5):
         self.images,self.rect = load_sprite_sheet("ptera.png",2,1,46, 40,-1)
@@ -226,6 +238,7 @@ class Ptera(pygame.sprite.Sprite):
         self.speed = speed
         # self.image = self.images[random.randint(0,5)]
         self.mask = pygame.mask.from_surface(self.image())
+
     def update(self):
         self.rect.left +=self.speed
 
@@ -266,6 +279,7 @@ class Scoreboard():
             self.temprect.left += self.temprect.width
         self.temprect.left = 0
 
+
 high_score_flag = False
 last_score = 0
 highsc = Scoreboard(WIDTH*0.78)
@@ -278,6 +292,8 @@ temp_rect.left += temp_rect.width
 HI_image.blit(temp_images[11],temp_rect)
 HI_rect.top = HEIGHT*0.1
 HI_rect.left = WIDTH*0.73
+
+
 def main():
     global high_score,high_score_flag,HI_image,HI_rect,highsc,last_score
     run = True
@@ -323,6 +339,7 @@ def main():
             obj.update()
             if obj.rect.right<0:
                 clouds.remove(obj)
+
 #--------------------Cactus------------------------------
         for cact in cactuslist:
             cact.draw()
@@ -346,6 +363,7 @@ def main():
                 run = False
                 dino.isDead = True
                 last_score = score
+
 #-----------------highScore------------------------------
         if high_score_flag == True:
             if high_score < score:
@@ -356,7 +374,6 @@ def main():
 
             win.blit(HI_image,HI_rect)
             highsc.draw()
-
 
 #--------------------------------------------------------
         scb.update(int(score))
