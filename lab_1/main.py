@@ -191,15 +191,15 @@ class Dino(pygame.sprite.Sprite):
             if self.isDuck:
                 return self.images1[0]
             else:
-                return  self.images[0]
+                return self.images[0]
         elif self.isDuck:
             if pygame.time.get_ticks() % 125 >= 62:
-                return  self.images1[0]
+                return self.images1[0]
             else:
                 return self.images1[1]
         else:
             if pygame.time.get_ticks() % 125 >= 62:
-                return  self.images[2]
+                return self.images[2]
             else:
                 return self.images[3]
 
@@ -258,7 +258,7 @@ class Ptera(pygame.sprite.Sprite):
 
     def image(self):
         if pygame.time.get_ticks() % 125 >= 62:
-            return  self.images[0]
+            return self.images[0]
         else:
             return self.images[1]
 
@@ -296,7 +296,7 @@ last_score = 0
 highsc = Scoreboard(WIDTH * 0.78)
 temp_images, temp_rect = load_sprite_sheet(
     'numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
-HI_image = pygame.Surface((22,int(11 * 6 / 5)))
+HI_image = pygame.Surface((22, int(11 * 6 / 5)))
 HI_rect = HI_image.get_rect()
 HI_image.fill(background_col)
 HI_image.blit(temp_images[10], temp_rect)
@@ -377,11 +377,11 @@ def main():
                 last_score = score
 
 #-----------------highScore------------------------------
-        if high_score_flag == True:
+        if high_score_flag:
             if high_score < score:
                 high_score = score
                 highsc.update(int(high_score))
-            if  score == last_score and dino.isDead == False:
+            if score == last_score and not dino.isDead:
                 checkPoint_sound.play()
 
             win.blit(HI_image, HI_rect)
