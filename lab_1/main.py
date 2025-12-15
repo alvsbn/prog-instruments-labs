@@ -105,8 +105,10 @@ def extractDigits(number):
 
 class Ground():
     def __init__(self, sizex=-1, sizey=-1, speed=-5):
-        self.image, self.rect = load_image("ground.png", sizex,sizey, -1)
-        self.image1, self.rect1 = load_image("ground.png", sizex,sizey, -1)
+        self.image, self.rect = load_image(
+            "ground.png", sizex, sizey, -1)
+        self.image1, self.rect1 = load_image(
+            "ground.png", sizex, sizey, -1)
         self.rect.left = 0
         self.rect1.left = self.rect.right
         self.rect.bottom = HEIGHT
@@ -129,7 +131,8 @@ class Ground():
 
 class Cloud:
     def __init__(self, x_pos, y_pos=random.randrange(0, 60), speed=-2):
-        self.image, self.rect = load_image('cloud.png', int(90 * 30 / 42), 30, -1)
+        self.image, self.rect = load_image(
+            'cloud.png', int(90 * 30 / 42), 30, -1)
         self.rect.left = x_pos
         self.rect.top = y_pos
         self.speed = speed
@@ -149,8 +152,10 @@ def collide(obj1, obj2):
 
 class Dino(pygame.sprite.Sprite):
     def __init__(self, sizex=-1, sizey=-1):
-        self.images, self.rect = load_sprite_sheet("dino.png", 5, 1, sizex, sizey, -1)
-        self.images1, self.rect1 = load_sprite_sheet("dino_ducking.png", 2, 1, sizex, sizey, -1)
+        self.images, self.rect = load_sprite_sheet(
+            "dino.png", 5, 1, sizex, sizey, -1)
+        self.images1, self.rect1 = load_sprite_sheet(
+            "dino_ducking.png", 2, 1, sizex, sizey, -1)
         self.isJump = False
         self.isDuck = False
         self.isDead = False
@@ -201,10 +206,14 @@ class Dino(pygame.sprite.Sprite):
 
 class Cactus(pygame.sprite.Sprite):
     def __init__(self, speed=-5, sizex=-1, sizey=-1):
-        self.images1, self.rect1 = load_sprite_sheet("cacti-small.png", 6, 1, sizex, sizey, -1)
-        self.images2, self.rect2 = load_sprite_sheet("cacti-small.png", 3, 1, sizex, sizey, -1)
-        self.images3, self.rect3 = load_sprite_sheet("cacti-big.png", 3, 1, 50, 50, -1)
-        self.images4, self.rect4 = load_sprite_sheet("cacti-small.png", 2, 1, 50, sizey, -1)
+        self.images1, self.rect1 = load_sprite_sheet(
+            "cacti-small.png", 6, 1, sizex, sizey, -1)
+        self.images2, self.rect2 = load_sprite_sheet(
+            "cacti-small.png", 3, 1, sizex, sizey, -1)
+        self.images3, self.rect3 = load_sprite_sheet(
+            "cacti-big.png", 3, 1, 50, 50, -1)
+        self.images4, self.rect4 = load_sprite_sheet(
+            "cacti-small.png", 2, 1, 50, sizey, -1)
         self.speed = speed
         self.image, self.rect = self.image()
         self.rect.left = WIDTH
@@ -232,7 +241,8 @@ class Cactus(pygame.sprite.Sprite):
 
 class Ptera(pygame.sprite.Sprite):
     def __init__(self, speed=-5):
-        self.images, self.rect = load_sprite_sheet("ptera.png", 2, 1, 46, 40, -1)
+        self.images, self.rect = load_sprite_sheet(
+            "ptera.png", 2, 1, 46, 40, -1)
         self.rect.left = WIDTH
         self.rect.bottom = random.randrange(40, 130)
         self.speed = speed
@@ -256,7 +266,8 @@ class Ptera(pygame.sprite.Sprite):
 class Scoreboard():
     def __init__(self, x=-1, y=-1):
         self.score = 0
-        self.tempimages, self.temprect = load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
+        self.tempimages, self.temprect = load_sprite_sheet(
+            'numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
         self.image = pygame.Surface((55, int(11 * 6 / 5)))
         self.rect = self.image.get_rect()
         if x == -1:
@@ -283,7 +294,8 @@ class Scoreboard():
 high_score_flag = False
 last_score = 0
 highsc = Scoreboard(WIDTH * 0.78)
-temp_images, temp_rect = load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
+temp_images, temp_rect = load_sprite_sheet(
+    'numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
 HI_image = pygame.Surface((22,int(11 * 6 / 5)))
 HI_rect = HI_image.get_rect()
 HI_image.fill(background_col)
@@ -332,7 +344,8 @@ def main():
 #-------------------Clouds-------------------------------
         obj_probality = random.randint(0, 120)
         if obj_probality == 1:
-            obj = Cloud(random.randrange(WIDTH, WIDTH + WIDTH / 2))
+            obj = Cloud(random.randrange(
+                WIDTH, WIDTH + WIDTH / 2))
             clouds.append(obj)
         for obj in clouds:
             obj.draw()
@@ -398,7 +411,8 @@ win.fill(white)
 logo, logo_rect = load_image("logo.png", 300, 140, -1)
 logo_rect.centerx = WIDTH * 0.6
 logo_rect.centery = HEIGHT * 0.6
-temp_ground, temp_ground_rect = load_sprite_sheet("ground.png", 15, 1, -1, -1, -1)
+temp_ground, temp_ground_rect = load_sprite_sheet(
+    "ground.png", 15, 1, -1, -1, -1)
 temp_ground_rect.left = WIDTH / 20
 temp_ground_rect.bottom = HEIGHT
 temp_dino = Dino(44, 47)
@@ -412,11 +426,13 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         if event.type == KEYDOWN:
-            if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+            if (event.key == pygame.K_SPACE or
+                event.key == pygame.K_RETURN):
                 main()
                 event = pygame.event.wait()
                 if event.type == KEYDOWN:
-                    if event.key ==  pygame.K_SPACE or event.key == pygame.K_RETURN:
+                    if (event.key ==  pygame.K_SPACE or
+                        event.key == pygame.K_RETURN):
                         run = True
 
 pygame.quit()
