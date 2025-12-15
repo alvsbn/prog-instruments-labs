@@ -33,7 +33,7 @@ def load_image(
     colorkey=None,
     ):
 
-    fullname = file_name = os.path.join('.', 'sprites', name)
+    fullname = os.path.join('.', 'sprites', name)
     image = pygame.image.load(fullname).convert()
 
     if colorkey is not None:
@@ -91,7 +91,7 @@ def load_sprite_sheet(
 def extractDigits(number):
     if number > -1:
         digits = []
-        i = 0
+
         while(number / 10 != 0):
             digits.append(number % 10)
             number = int(number / 10)
@@ -246,7 +246,7 @@ class Ptera(pygame.sprite.Sprite):
         self.rect.left = WIDTH
         self.rect.bottom = random.randrange(40, 130)
         self.speed = speed
-        # self.image = self.images[random.randint(0,5)]
+
         self.mask = pygame.mask.from_surface(self.image())
 
     def update(self):
@@ -315,7 +315,6 @@ def main():
     cactuslist = []
     clouds = []
     ptera = []
-    interval = 1
     scb = Scoreboard()
 
     while run:
