@@ -1,7 +1,8 @@
-import pygame
-import random
 import os
-from pygame import *
+import random
+
+import pygame
+from pygame import RLEACCEL, KEYDOWN
 
 
 
