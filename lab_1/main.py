@@ -7,55 +7,55 @@ from pygame import RLEACCEL, KEYDOWN
 
 pygame.init()
 
-size = WIDTH, HEIGHT = (600, 150)
-win = pygame.display.set_mode(size)
+SIZE = WIDTH, HEIGHT = (600, 150)
+win = pygame.display.set_mode(SIZE)
 pygame.display.set_caption("Dino Run")
 
-black = (0, 0, 0)
-white = (255, 255, 255)
-background_col = (235, 235, 235)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+BACKGROUND_COL = (235, 235, 235)
 
 jump_sound = pygame.mixer.Sound('sprites/jump.wav')
 die_sound = pygame.mixer.Sound('sprites/die.wav')
-checkPoint_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
+check_point_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
 
-high_score = 0
+HIGH_SCORE = 0
 FPS = 60
-gravity = 0.6
+GRAVITY = 0.6
 
 clock = pygame.time.Clock()
 
 
 def load_image(
     name,
-    sizex=-1,
-    sizey=-1,
-    colorkey=None,
+    size_x=-1,
+    size_y=-1,
+    color_key=None,
     ):
 
     fullname = os.path.join('.', 'sprites', name)
     image = pygame.image.load(fullname).convert()
 
-    if colorkey is not None:
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey, RLEACCEL)
+    if color_key is not None:
+        if color_key == -1:
+            color_key = image.get_at((0, 0))
+        image.set_colorkey(color_key, RLEACCEL)
 
-    if sizex != -1 or sizey != -1:
-        image = pygame.transform.scale(image, (sizex, sizey))
+    if size_x != -1 or size_y != -1:
+        image = pygame.transform.scale(image, (size_x, size_y))
 
     return (image, image.get_rect())
 
 
 def load_sprite_sheet(
-        sheetname,
+        sheet_name,
         nx,
         ny,
-        scalex=-1,
-        scaley=-1,
-        colorkey=None,
+        scale_x=-1,
+        scale_y=-1,
+        color_key=None,
         ):
-    fullname = os.path.join('sprites', sheetname)
+    fullname = os.path.join('sprites', sheet_name)
     sheet = pygame.image.load(fullname)
     sheet = sheet.convert()
 
@@ -63,23 +63,23 @@ def load_sprite_sheet(
 
     sprites = []
 
-    sizex = sheet_rect.width / nx
-    sizey = sheet_rect.height / ny
+    size_x = sheet_rect.width / nx
+    size_y = sheet_rect.height / ny
 
     for i in range(0, ny):
         for j in range(0, nx):
-            rect = pygame.Rect((j * sizex, i * sizey, sizex, sizey))
+            rect = pygame.Rect((j * size_x, i * size_y, size_x, size_y))
             image = pygame.Surface(rect.size)
             image = image.convert()
             image.blit(sheet, (0, 0), rect)
 
-            if colorkey is not None:
-                if colorkey == -1:
-                    colorkey = image.get_at((0, 0))
-                image.set_colorkey(colorkey, RLEACCEL)
+            if color_key is not None:
+                if color_key == -1:
+                    color_key = image.get_at((0, 0))
+                image.set_colorkey(color_key, RLEACCEL)
 
-            if scalex != -1 or scaley != -1:
-                image = pygame.transform.scale(image, (scalex, scaley))
+            if scale_x != -1 or scale_y != -1:
+                image = pygame.transform.scale(image, (scale_x, scale_y))
 
             sprites.append(image)
 
@@ -88,7 +88,7 @@ def load_sprite_sheet(
     return sprites, sprite_rect
 
 
-def extractDigits(number):
+def extract_digits(number):
     if number > -1:
         digits = []
 
@@ -104,11 +104,11 @@ def extractDigits(number):
 
 
 class Ground():
-    def __init__(self, sizex=-1, sizey=-1, speed=-5):
+    def __init__(self, size_x=-1, size_y=-1, speed=-5):
         self.image, self.rect = load_image(
-            "ground.png", sizex, sizey, -1)
+            "ground.png", size_x, size_y, -1)
         self.image1, self.rect1 = load_image(
-            "ground.png", sizex, sizey, -1)
+            "ground.png", size_x, size_y, -1)
         self.rect.left = 0
         self.rect1.left = self.rect.right
         self.rect.bottom = HEIGHT
@@ -151,33 +151,33 @@ def collide(obj1, obj2):
 
 
 class Dino(pygame.sprite.Sprite):
-    def __init__(self, sizex=-1, sizey=-1):
+    def __init__(self, size_x=-1, size_y=-1):
         self.images, self.rect = load_sprite_sheet(
-            "dino.png", 5, 1, sizex, sizey, -1)
+            "dino.png", 5, 1, size_x, size_y, -1)
         self.images1, self.rect1 = load_sprite_sheet(
-            "dino_ducking.png", 2, 1, sizex, sizey, -1)
-        self.isJump = False
-        self.isDuck = False
-        self.isDead = False
+            "dino_ducking.png", 2, 1, size_x, size_y, -1)
+        self.is_jump = False
+        self.is_duck = False
+        self.is_dead = False
         self.rect.left = WIDTH / 15
         self.rect.bottom = int(0.98 * HEIGHT)
         self.standing_pos = self.images[0]
         self.ducking_pos = self.images1[0]
-        self.jumpCount = 17
+        self.jump_count = 17
         self.neg = -1
         self.mask = pygame.mask.from_surface(self.image())
 
     def update(self):
-        if self.isJump:
-            if self.jumpCount == 0:
+        if self.is_jump:
+            if self.jump_count == 0:
                 jump_sound.play()
                 self.neg = 1
-            self.rect.bottom += (self.jumpCount**2) * 0.05 * self.neg
-            self.jumpCount -= 1
-            if self.jumpCount <= -17:
-                self.jumpCount = 17
+            self.rect.bottom += (self.jump_count**2) * 0.05 * self.neg
+            self.jump_count -= 1
+            if self.jump_count <= -17:
+                self.jump_count = 17
                 self.neg = -1
-                self.isJump = False
+                self.is_jump = False
                 self.rect.bottom = int(0.98 * HEIGHT)
 
     def draw(self):
@@ -185,14 +185,14 @@ class Dino(pygame.sprite.Sprite):
         win.blit(self.image(), self.rect)
 
     def image(self):
-        if self.isDead:
+        if self.is_dead:
             return self.images[4]
-        elif self.isJump:
-            if self.isDuck:
+        elif self.is_jump:
+            if self.is_duck:
                 return self.images1[0]
             else:
                 return self.images[0]
-        elif self.isDuck:
+        elif self.is_duck:
             if pygame.time.get_ticks() % 125 >= 62:
                 return self.images1[0]
             else:
@@ -205,15 +205,15 @@ class Dino(pygame.sprite.Sprite):
 
 
 class Cactus(pygame.sprite.Sprite):
-    def __init__(self, speed=-5, sizex=-1, sizey=-1):
+    def __init__(self, speed=-5, size_x=-1, size_y=-1):
         self.images1, self.rect1 = load_sprite_sheet(
-            "cacti-small.png", 6, 1, sizex, sizey, -1)
+            "cacti-small.png", 6, 1, size_x, size_y, -1)
         self.images2, self.rect2 = load_sprite_sheet(
-            "cacti-small.png", 3, 1, sizex, sizey, -1)
+            "cacti-small.png", 3, 1, size_x, size_y, -1)
         self.images3, self.rect3 = load_sprite_sheet(
             "cacti-big.png", 3, 1, 50, 50, -1)
         self.images4, self.rect4 = load_sprite_sheet(
-            "cacti-small.png", 2, 1, 50, sizey, -1)
+            "cacti-small.png", 2, 1, 50, size_y, -1)
         self.speed = speed
         self.image, self.rect = self.image()
         self.rect.left = WIDTH
@@ -266,7 +266,7 @@ class Ptera(pygame.sprite.Sprite):
 class Scoreboard():
     def __init__(self, x=-1, y=-1):
         self.score = 0
-        self.tempimages, self.temprect = load_sprite_sheet(
+        self.temp_images, self.temp_rect = load_sprite_sheet(
             'numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
         self.image = pygame.Surface((55, int(11 * 6 / 5)))
         self.rect = self.image.get_rect()
@@ -283,42 +283,42 @@ class Scoreboard():
         win.blit(self.image, self.rect)
 
     def update(self, score):
-        score_digits = extractDigits(score)
-        self.image.fill(background_col)
+        score_digits = extract_digits(score)
+        self.image.fill(BACKGROUND_COL)
         for s in score_digits:
-            self.image.blit(self.tempimages[s], self.temprect)
-            self.temprect.left += self.temprect.width
-        self.temprect.left = 0
+            self.image.blit(self.temp_images[s], self.temp_rect)
+            self.temp_rect.left += self.temp_rect.width
+        self.temp_rect.left = 0
 
 
 high_score_flag = False
 last_score = 0
-highsc = Scoreboard(WIDTH * 0.78)
+high_sc = Scoreboard(WIDTH * 0.78)
 temp_images, temp_rect = load_sprite_sheet(
     'numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
-HI_image = pygame.Surface((22, int(11 * 6 / 5)))
-HI_rect = HI_image.get_rect()
-HI_image.fill(background_col)
-HI_image.blit(temp_images[10], temp_rect)
+hi_image = pygame.Surface((22, int(11 * 6 / 5)))
+hi_rect = hi_image.get_rect()
+hi_image.fill(BACKGROUND_COL)
+hi_image.blit(temp_images[10], temp_rect)
 temp_rect.left += temp_rect.width
-HI_image.blit(temp_images[11], temp_rect)
-HI_rect.top = HEIGHT * 0.1
-HI_rect.left = WIDTH * 0.73
+hi_image.blit(temp_images[11], temp_rect)
+hi_rect.top = HEIGHT * 0.1
+hi_rect.left = WIDTH * 0.73
 
 
 def main():
-    global high_score, high_score_flag, HI_image, HI_rect, highsc, last_score
+    global HIGH_SCORE, high_score_flag, hi_image, hi_rect, high_sc, last_score
     run = True
     ground = Ground()
     dino = Dino(44, 47)
     frame_clock = 0
-    cactuslist = []
+    cactus_list = []
     clouds = []
     ptera = []
     scb = Scoreboard()
 
     while run:
-        win.fill(background_col)
+        win.fill(BACKGROUND_COL)
         ground.draw()
         clock.tick(FPS)
         score = frame_clock / 30
@@ -326,23 +326,23 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYUP:
-                dino.isDuck = False
+                dino.is_duck = False
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
-            dino.isJump = True
+            dino.is_jump = True
         if keys[pygame.K_DOWN]:
-            dino.isDuck = True
+            dino.is_duck = True
 
         if not (frame_clock % 90):
-            obj_probality = random.randint(0, 5)
-            if obj_probality == 1:
+            obj_probability = random.randint(0, 5)
+            if obj_probability == 1:
                 ptera.insert(0, Ptera())
             else:
-                cactuslist.insert(0, Cactus(-5, 40, 40))
+                cactus_list.insert(0, Cactus(-5, 40, 40))
 
 #-------------------Clouds-------------------------------
-        obj_probality = random.randint(0, 120)
-        if obj_probality == 1:
+        obj_probability = random.randint(0, 120)
+        if obj_probability == 1:
             obj = Cloud(random.randrange(
                 WIDTH, WIDTH + WIDTH / 2))
             clouds.append(obj)
@@ -353,15 +353,15 @@ def main():
                 clouds.remove(obj)
 
 #--------------------Cactus------------------------------
-        for cact in cactuslist:
-            cact.draw()
-            if cact.rect.left < 0:
-                cactuslist.pop()
-            if collide(dino, cact):
+        for cactus in cactus_list:
+            cactus.draw()
+            if cactus.rect.left < 0:
+                cactus_list.pop()
+            if collide(dino, cactus):
                 high_score_flag = True
                 die_sound.play()
                 run = False
-                dino.isDead = True
+                dino.is_dead = True
                 last_score = score
 
 #--------------------Ptera-------------------------------
@@ -373,19 +373,19 @@ def main():
                 high_score_flag = True
                 die_sound.play()
                 run = False
-                dino.isDead = True
+                dino.is_dead = True
                 last_score = score
 
 #-----------------highScore------------------------------
         if high_score_flag:
-            if high_score < score:
-                high_score = score
-                highsc.update(int(high_score))
-            if score == last_score and not dino.isDead:
-                checkPoint_sound.play()
+            if HIGH_SCORE < score:
+                HIGH_SCORE = score
+                high_sc.update(int(HIGH_SCORE))
+            if score == last_score and not dino.is_dead:
+                check_point_sound.play()
 
-            win.blit(HI_image, HI_rect)
-            highsc.draw()
+            win.blit(hi_image, hi_rect)
+            high_sc.draw()
 
 #--------------------------------------------------------
         scb.update(int(score))
@@ -406,7 +406,7 @@ def main():
     pygame.time.delay(2000)
 
 
-win.fill(white)
+win.fill(WHITE)
 logo, logo_rect = load_image("logo.png", 300, 140, -1)
 logo_rect.centerx = WIDTH * 0.6
 logo_rect.centery = HEIGHT * 0.6
