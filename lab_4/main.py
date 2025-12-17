@@ -1,5 +1,6 @@
 import pygame
 import random
+from constants import Constants
 
 """
 10 x 20 square grid
@@ -9,141 +10,19 @@ represented in order by 0 - 6
 
 pygame.font.init()
 
-# GLOBALS VARS
-s_width = 800
-s_height = 700
-play_width = 300  # meaning 300 // 10 = 30 width per block
-play_height = 600  # meaning 600 // 20 = 20 height per blo ck
-block_size = 30
-
-top_left_x = (s_width - play_width) // 2
-top_left_y = s_height - play_height
-
-# SHAPE FORMATS
-
-S = [['.....',
-      '.....',
-      '..00.',
-      '.00..',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..00.',
-      '...0.',
-      '.....']]
-
-Z = [['.....',
-      '.....',
-      '.00..',
-      '..00.',
-      '.....'],
-     ['.....',
-      '..0..',
-      '.00..',
-      '.0...',
-      '.....']]
-
-I = [['..0..',
-      '..0..',
-      '..0..',
-      '..0..',
-      '.....'],
-     ['.....',
-      '0000.',
-      '.....',
-      '.....',
-      '.....']]
-
-O = [['.....',
-      '.....',
-      '.00..',
-      '.00..',
-      '.....']]
-
-J = [['.....',
-      '.0...',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..00.',
-      '..0..',
-      '..0..',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '...0.',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..0..',
-      '.00..',
-      '.....']]
-
-L = [['.....',
-      '...0.',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..0..',
-      '..00.',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '.0...',
-      '.....'],
-     ['.....',
-      '.00..',
-      '..0..',
-      '..0..',
-      '.....']]
-
-T = [['.....',
-      '..0..',
-      '.000.',
-      '.....',
-      '.....'],
-     ['.....',
-      '..0..',
-      '..00.',
-      '..0..',
-      '.....'],
-     ['.....',
-      '.....',
-      '.000.',
-      '..0..',
-      '.....'],
-     ['.....',
-      '..0..',
-      '.00..',
-      '..0..',
-      '.....']]
-
-shapes = [S, Z, I, O, J, L, T]
-shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
-
-
-# index 0 - 6 represent shape
-
 
 class Piece(object):
-    rows = 20  # y
-    columns = 10  # x
 
     def __init__(self, column, row, shape):
         self.x = column
         self.y = row
         self.shape = shape
-        self.color = shape_colors[shapes.index(shape)]
+        self.color = Constants.SHAPE_COLORS[Constants.SHAPES.index(shape)]
         self.rotation = 0  # number from 0-3
 
 
 def create_grid(locked_positions={}):
-    grid = [[(0, 0, 0) for x in range(10)] for x in range(20)]
+    grid = [[Constants.COLOR_BLACK for x in range(Constants.GRID_COLS)] for x in range(Constants.GRID_ROWS)]
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
@@ -170,7 +49,7 @@ def convert_shape_format(shape):
 
 
 def valid_space(shape, grid):
-    accepted_positions = [[(j, i) for j in range(10) if grid[i][j] == (0, 0, 0)] for i in range(20)]
+    accepted_positions = [[(j, i) for j in range(Constants.GRID_COLS) if grid[i][j] == Constants.COLOR_BLACK] for i in range(Constants.GRID_ROWS)]
     accepted_positions = [j for sub in accepted_positions for j in sub]
     formatted = convert_shape_format(shape)
 
@@ -191,9 +70,9 @@ def check_lost(positions):
 
 
 def get_shape():
-    global shapes, shape_colors
-
-    return Piece(5, 0, random.choice(shapes))
+    return Piece(Constants.START_POSITION_X,
+                 Constants.START_POSITION_Y,
+                 random.choice(Constants.SHAPES))
 
 
 def draw_text_middle(text, size, color, surface):
@@ -201,18 +80,20 @@ def draw_text_middle(text, size, color, surface):
     label = font.render(text, 1, color)
 
     surface.blit(label, (
-    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
+    Constants.TOP_LEFT_X + Constants.PLAY_WIDTH / 2 - (label.get_width() / 2),
+    Constants.TOP_LEFT_Y + Constants.PLAY_HEIGHT / 2 - label.get_height() / 2
+    ))
 
 
 def draw_grid(surface, row, col):
-    sx = top_left_x
-    sy = top_left_y
+    sx = Constants.TOP_LEFT_X
+    sy = Constants.TOP_LEFT_Y
     for i in range(row):
-        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * 30),
-                         (sx + play_width, sy + i * 30))  # horizontal lines
+        pygame.draw.line(surface, Constants.COLOR_GRAY, (sx, sy + i * Constants.BLOCK_SIZE),
+                         (sx + Constants.PLAY_WIDTH, sy + i * Constants.BLOCK_SIZE))  # horizontal lines
         for j in range(col):
-            pygame.draw.line(surface, (128, 128, 128), (sx + j * 30, sy),
-                             (sx + j * 30, sy + play_height))  # vertical lines
+            pygame.draw.line(surface, Constants.COLOR_GRAY, (sx + j * Constants.BLOCK_SIZE, sy),
+                             (sx + j * Constants.BLOCK_SIZE, sy + Constants.PLAY_HEIGHT))  # vertical lines
 
 
 def clear_rows(grid, locked):
@@ -221,7 +102,7 @@ def clear_rows(grid, locked):
     inc = 0
     for i in range(len(grid) - 1, -1, -1):
         row = grid[i]
-        if (0, 0, 0) not in row:
+        if Constants.COLOR_BLACK not in row:
             inc += 1
             # add positions to remove from locked
             ind = i
@@ -240,36 +121,44 @@ def clear_rows(grid, locked):
 
 def draw_next_shape(shape, surface):
     font = pygame.font.SysFont('comicsans', 30)
-    label = font.render('Next Shape', 1, (255, 255, 255))
+    label = font.render('Next Shape', 1, Constants.COLOR_WHITE)
 
-    sx = top_left_x + play_width + 50
-    sy = top_left_y + play_height / 2 - 100
+    sx = Constants.TOP_LEFT_X + Constants.PLAY_WIDTH + 50
+    sy = Constants.TOP_LEFT_Y + Constants.PLAY_HEIGHT / 2 - 100
     format = shape.shape[shape.rotation % len(shape.shape)]
 
     for i, line in enumerate(format):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
-                pygame.draw.rect(surface, shape.color, (sx + j * 30, sy + i * 30, 30, 30), 0)
+                pygame.draw.rect(surface, shape.color,
+                                 (sx + j * Constants.BLOCK_SIZE,
+                                  sy + i * Constants.BLOCK_SIZE,
+                                  Constants.BLOCK_SIZE,
+                                  Constants.BLOCK_SIZE), 0)
 
     surface.blit(label, (sx + 10, sy - 30))
 
 
 def draw_window(surface):
-    surface.fill((0, 0, 0))
+    surface.fill(Constants.COLOR_BLACK)
     # Tetris Title
     font = pygame.font.SysFont('comicsans', 60)
-    label = font.render('TETRIS', 1, (255, 255, 255))
+    label = font.render('TETRIS', 1, Constants.COLOR_WHITE)
 
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
+    surface.blit(label, (Constants.TOP_LEFT_X + Constants.PLAY_WIDTH / 2 - (label.get_width() / 2), 30))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j], (top_left_x + j * 30, top_left_y + i * 30, 30, 30), 0)
+            pygame.draw.rect(surface, grid[i][j],
+                             (Constants.TOP_LEFT_X + j * Constants.BLOCK_SIZE,
+                              Constants.TOP_LEFT_Y + i * Constants.BLOCK_SIZE,
+                              Constants.BLOCK_SIZE, Constants.BLOCK_SIZE), 0)
 
     # draw grid and border
-    draw_grid(surface, 20, 10)
-    pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
+    draw_grid(surface, Constants.GRID_ROWS, Constants.GRID_COLS)
+    pygame.draw.rect(surface, Constants.COLOR_RED,
+                     (Constants.TOP_LEFT_X, Constants.TOP_LEFT_Y, Constants.PLAY_WIDTH, Constants.PLAY_HEIGHT), 5)
     # pygame.display.update()
 
 
@@ -286,7 +175,6 @@ def main():
     clock = pygame.time.Clock()
     fall_time = 0
     level_time = 0
-    fall_speed = 0.27
     score = 0
 
     while run:
@@ -296,13 +184,13 @@ def main():
         level_time += clock.get_rawtime()
         clock.tick()
 
-        if level_time / 1000 > 4:
+        if level_time / 1000 > Constants.LEVEL_UP_TIME_SECONDS:
             level_time = 0
-            if fall_speed > 0.15:
-                fall_speed -= 0.005
+            if Constants.FALL_SPEED > Constants.FALL_SPEED_MIN:
+                Constants.FALL_SPEED -= Constants.FALL_SPEED_DECREMENT
 
         # PIECE FALLING CODE
-        if fall_time / 1000 >= fall_speed:
+        if fall_time / 1000 >= Constants.FALL_SPEED:
             fall_time = 0
             current_piece.y += 1
             if not (valid_space(current_piece, grid)) and current_piece.y > 0:
@@ -372,16 +260,16 @@ def main():
         if check_lost(locked_positions):
             run = False
 
-    draw_text_middle("You Lost", 40, (255, 255, 255), win)
+    draw_text_middle("You Lost", 40, Constants.COLOR_WHITE, win)
     pygame.display.update()
-    pygame.time.delay(2000)
+    pygame.time.delay(Constants.GAME_OVER_DELAY_MS)
 
 
 def main_menu():
     run = True
     while run:
-        win.fill((0, 0, 0))
-        draw_text_middle('Press any key to begin.', 60, (255, 255, 255), win)
+        win.fill(Constants.COLOR_BLACK)
+        draw_text_middle('Press any key to begin.', 60, Constants.COLOR_WHITE, win)
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -392,7 +280,7 @@ def main_menu():
     pygame.quit()
 
 
-win = pygame.display.set_mode((s_width, s_height))
+win = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
 pygame.display.set_caption('Tetris')
 
 main_menu()  # start game
