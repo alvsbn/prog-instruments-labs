@@ -1,119 +1,142 @@
 import pygame
+
 from constants import Constants
 from ui import draw_window, draw_next_shape, draw_text_middle, draw_current_piece_on_grid
 from piece import get_shape
 from grid import create_grid, clear_rows, check_lost
 
 
-def update_game_timing(fall_time, level_time, clock):
-    fall_time += clock.get_rawtime()
-    level_time += clock.get_rawtime()
-    clock.tick()
-    return fall_time, level_time
+class TetrisGame:
+    def __init__(self):
+        pygame.init()
+        self.locked_positions = {}
+        self.run = True
+        self.current_piece = None
+        self.next_piece = None
+        self.clock = pygame.time.Clock()
+        self.fall_time = 0
+        self.level_time = 0
+        self.score = 0
+        self.window = None
+
+    def init_game(self):
+        self.locked_positions.clear()
+        self.run = True
+        self.current_piece = get_shape()
+        self.next_piece = get_shape()
+        self.clock = pygame.time.Clock()
+        self.fall_time = 0
+        self.level_time = 0
+        self.score = 0
+
+        if self.window is None:
+            self.window = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
+            pygame.display.set_caption('Tetris')
+
+    def update_game_timing(self):
+        self.fall_time += self.clock.get_rawtime()
+        self.level_time += self.clock.get_rawtime()
+        self.clock.tick()
+
+    def increase_game_difficulty(self):
+        if self.level_time / 1000 > Constants.LEVEL_UP_TIME_SECONDS:
+            self.level_time = 0
+            if Constants.FALL_SPEED > Constants.FALL_SPEED_MIN:
+                Constants.FALL_SPEED -= Constants.FALL_SPEED_DECREMENT
+
+    def move_piece_down(self):
+        change_piece = False
+        if self.fall_time / 1000 >= Constants.FALL_SPEED:
+            self.fall_time = 0
+            self.current_piece.y += 1
+            grid = create_grid(self.locked_positions)
+            if not (self.current_piece.valid_space(grid)) and self.current_piece.y > 0:
+                self.current_piece.y -= 1
+                change_piece = True
+        return change_piece
+
+    def handle_player_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.run = False
+                return
+
+            if event.type == pygame.KEYDOWN:
+                self.handle_single_keypress(event)
+
+    def handle_single_keypress(self, event):
+        grid = create_grid(self.locked_positions)
+        match event.key:
+            case pygame.K_LEFT:
+                self.current_piece.x -= 1
+                if not self.current_piece.valid_space(grid):
+                    self.current_piece.x += 1
+
+            case pygame.K_RIGHT:
+                self.current_piece.x += 1
+                if not self.current_piece.valid_space(grid):
+                    self.current_piece.x -= 1
+
+            case pygame.K_UP:
+                self.current_piece.rotation = (self.current_piece.rotation + 1) % len(self.current_piece.shape)
+                if not self.current_piece.valid_space(grid):
+                    self.current_piece.rotation = (self.current_piece.rotation - 1) % len(self.current_piece.shape)
+
+            case pygame.K_DOWN:
+                self.current_piece.y += 1
+                if not self.current_piece.valid_space(grid):
+                    self.current_piece.y -= 1
 
 
-def increase_game_difficulty(level_time):
-    if level_time / 1000 > Constants.LEVEL_UP_TIME_SECONDS:
-        level_time = 0
-        if Constants.FALL_SPEED > Constants.FALL_SPEED_MIN:
-            Constants.FALL_SPEED -= Constants.FALL_SPEED_DECREMENT
-    return level_time
+    def lock_piece_to_grid(self, shape_pos):
+        grid = create_grid(self.locked_positions)
 
+        for pos in shape_pos:
+            p = (pos[0], pos[1])
+            self.locked_positions[p] = self.current_piece.color
 
-def move_piece_down(current_piece, grid, fall_time):
-    change_piece = False
-    if fall_time / 1000 >= Constants.FALL_SPEED:
-        fall_time = 0
-        current_piece.y += 1
-        if not (current_piece.valid_space(grid)) and current_piece.y > 0:
-            current_piece.y -= 1
-            change_piece = True
-    return fall_time, change_piece
+        self.current_piece = self.next_piece
+        self.next_piece = get_shape()
 
+        rows_cleared = clear_rows(grid, self.locked_positions)
+        if rows_cleared > 0:
+            self.score += rows_cleared * Constants.SCORE_PER_ROW
 
-def handle_player_input(current_piece, grid, run):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-            pygame.display.quit()
-            quit()
+    def run_game(self):
+        self.init_game()
 
-        if event.type == pygame.KEYDOWN:
-            handle_single_keypress(event, current_piece, grid)
-    return run
-
-
-def handle_single_keypress(event, current_piece, grid):
-    match event.key:
-        case pygame.K_LEFT:
-            current_piece.x -= 1
-            if not current_piece.valid_space(grid):
-                current_piece.x += 1
-
-        case pygame.K_RIGHT:
-            current_piece.x += 1
-            if not current_piece.valid_space(grid):
-                current_piece.x -= 1
-
-        case pygame.K_UP:
-            current_piece.rotation = (current_piece.rotation + 1) % len(current_piece.shape)
-            if not current_piece.valid_space(grid):
-                current_piece.rotation = (current_piece.rotation - 1) % len(current_piece.shape)
-
-        case pygame.K_DOWN:
-            current_piece.y += 1
-            if not current_piece.valid_space(grid):
-                current_piece.y -= 1
-
-
-def lock_piece_to_grid(shape_pos, current_piece, locked_positions, next_piece, grid, score):
-    for pos in shape_pos:
-        p = (pos[0], pos[1])
-        locked_positions[p] = current_piece.color
-
-    current_piece = next_piece
-    next_piece = get_shape()
-    change_piece = False
-
-    if clear_rows(grid, locked_positions):
-        score += 10
-
-    return current_piece, next_piece, change_piece, score
-
-
-def main():
-    locked_positions = {}
-    run = True
-    current_piece = get_shape()
-    next_piece = get_shape()
-    clock = pygame.time.Clock()
-    fall_time = 0
-    level_time = 0
-    score = 0
-
-    win = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
-    pygame.display.set_caption('Tetris')
-
-    while run:
-        grid = create_grid(locked_positions)
-        fall_time, level_time = update_game_timing(fall_time, level_time, clock)
-        level_time = increase_game_difficulty(level_time)
-        fall_time, change_piece = move_piece_down(current_piece, grid, fall_time)
-        run = handle_player_input(current_piece, grid, run)
-        shape_pos = draw_current_piece_on_grid(current_piece, grid)
-
-        if change_piece:
-            current_piece, next_piece, change_piece, score = lock_piece_to_grid(
-                shape_pos, current_piece, locked_positions, next_piece, grid, score
-            )
-
-        draw_window(win, grid)
-        draw_next_shape(next_piece, win)
+        self.window.fill(Constants.COLOR_BLACK)
+        draw_text_middle('Press any key to start!', 40, Constants.COLOR_WHITE, self.window)
         pygame.display.update()
 
-        if check_lost(locked_positions):
-            run = False
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.run = False
+                    waiting = False
+                if event.type == pygame.KEYDOWN:
+                    waiting = False
 
-    draw_text_middle("You Lost", 40, Constants.COLOR_WHITE, win)
-    pygame.display.update()
-    pygame.time.delay(Constants.GAME_OVER_DELAY_MS)
+        while self.run:
+            grid = create_grid(self.locked_positions)
+            self.update_game_timing()
+            self.increase_game_difficulty()
+            change_piece = self.move_piece_down()
+            self.handle_player_input()
+
+            shape_pos = draw_current_piece_on_grid(self.current_piece, grid)
+
+            if change_piece:
+                self.lock_piece_to_grid(shape_pos)
+
+            draw_window(self.window, grid)
+            draw_next_shape(self.next_piece, self.window)
+            pygame.display.update()
+
+            if check_lost(self.locked_positions):
+                self.run = False
+
+        draw_text_middle("You Lost", 40, Constants.COLOR_WHITE, self.window)
+        pygame.display.update()
+        pygame.time.delay(Constants.GAME_OVER_DELAY_MS)
