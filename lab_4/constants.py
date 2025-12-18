@@ -9,8 +9,6 @@ class Constants:
     TOP_LEFT_X = (SCREEN_WIDTH - PLAY_WIDTH) // 2
     TOP_LEFT_Y = SCREEN_HEIGHT - PLAY_HEIGHT
 
-
-    # SHAPE FORMATS
     SHAPE_S = [['.....',
                 '.....',
                 '..00.',

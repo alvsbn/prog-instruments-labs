@@ -1,4 +1,5 @@
 import pygame
+
 from constants import Constants
 
 
@@ -10,6 +11,7 @@ def draw_text_middle(text, size, color, surface):
     Constants.TOP_LEFT_X + Constants.PLAY_WIDTH / 2 - (label.get_width() / 2),
     Constants.TOP_LEFT_Y + Constants.PLAY_HEIGHT / 2 - label.get_height() / 2
     ))
+
 
 def draw_grid(surface, row, col):
     sx = Constants.TOP_LEFT_X

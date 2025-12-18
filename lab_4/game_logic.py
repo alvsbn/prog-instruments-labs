@@ -1,9 +1,9 @@
 import pygame
 
 from constants import Constants
-from ui import draw_window, draw_next_shape, draw_text_middle, draw_current_piece_on_grid
-from piece import get_shape
 from grid import create_grid, clear_rows, check_lost
+from piece import get_shape
+from ui import draw_window, draw_next_shape, draw_text_middle, draw_current_piece_on_grid
 
 
 class TetrisGame:
@@ -86,7 +86,6 @@ class TetrisGame:
                 self.current_piece.y += 1
                 if not self.current_piece.valid_space(grid):
                     self.current_piece.y -= 1
-
 
     def lock_piece_to_grid(self, shape_pos):
         grid = create_grid(self.locked_positions)

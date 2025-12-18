@@ -1,4 +1,5 @@
 import random
+
 from constants import Constants
 
 
@@ -10,7 +11,6 @@ class Piece(object):
         self.shape = shape
         self.color = Constants.SHAPE_COLORS[Constants.SHAPES.index(shape)]
         self.rotation = 0
-
 
     def convert_shape_format(self):
         positions = []
@@ -26,7 +26,6 @@ class Piece(object):
             positions[i] = (pos[0] - 2, pos[1] - 4)
 
         return positions
-
 
     def valid_space(self, grid):
         accepted_positions = [[(j, i) for j in range(Constants.GRID_COLS) if
