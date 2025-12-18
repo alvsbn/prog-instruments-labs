@@ -2,8 +2,8 @@ class Constants:
 
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 700
-    PLAY_WIDTH = 300  # 300 // 10 = 30 width per block
-    PLAY_HEIGHT = 600  # 600 // 20 = 20 height per block
+    PLAY_WIDTH = 300
+    PLAY_HEIGHT = 600
     BLOCK_SIZE = 30
 
     TOP_LEFT_X = (SCREEN_WIDTH - PLAY_WIDTH) // 2

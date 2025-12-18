@@ -1,8 +1,7 @@
 import pygame
-from ui import draw_window, draw_next_shape, draw_grid, draw_text_middle
+from ui import  draw_text_middle
 from constants import Constants
-from piece import Piece, get_shape
-from grid import create_grid, clear_rows, check_lost
+
 from game_logic import main
 
 

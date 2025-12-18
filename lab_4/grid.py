@@ -13,14 +13,11 @@ def create_grid(locked_positions={}):
 
 
 def clear_rows(grid, locked):
-    # need to see if row is clear the shift every other row above down one
-
     inc = 0
     for i in range(len(grid) - 1, -1, -1):
         row = grid[i]
         if Constants.COLOR_BLACK not in row:
             inc += 1
-            # add positions to remove from locked
             ind = i
             for j in range(len(row)):
                 try:

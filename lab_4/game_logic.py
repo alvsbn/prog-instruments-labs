@@ -4,6 +4,7 @@ from ui import draw_window, draw_next_shape, draw_text_middle, draw_current_piec
 from piece import get_shape
 from grid import create_grid, clear_rows, check_lost
 
+
 def update_game_timing(fall_time, level_time, clock):
     fall_time += clock.get_rawtime()
     level_time += clock.get_rawtime()
@@ -53,13 +54,11 @@ def handle_single_keypress(event, current_piece, grid):
         if not current_piece.valid_space(grid):
             current_piece.x -= 1
     elif event.key == pygame.K_UP:
-        # rotate shape
         current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
         if not current_piece.valid_space(grid):
             current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
 
     if event.key == pygame.K_DOWN:
-        # move shape down
         current_piece.y += 1
         if not current_piece.valid_space(grid):
             current_piece.y -= 1
@@ -82,8 +81,6 @@ def lock_piece_to_grid(shape_pos, current_piece, locked_positions, next_piece, g
 
 def main():
     locked_positions = {}
-    grid = create_grid(locked_positions)
-    change_piece = False
     run = True
     current_piece = get_shape()
     next_piece = get_shape()

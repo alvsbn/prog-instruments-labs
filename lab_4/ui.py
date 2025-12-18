@@ -45,7 +45,6 @@ def draw_next_shape(shape, surface):
 
 def draw_window(surface, grid):
     surface.fill(Constants.COLOR_BLACK)
-    # Tetris Title
     font = pygame.font.SysFont('comicsans', 60)
     label = font.render('TETRIS', 1, Constants.COLOR_WHITE)
 
@@ -58,11 +57,9 @@ def draw_window(surface, grid):
                               Constants.TOP_LEFT_Y + i * Constants.BLOCK_SIZE,
                               Constants.BLOCK_SIZE, Constants.BLOCK_SIZE), 0)
 
-    # draw grid and border
     draw_grid(surface, Constants.GRID_ROWS, Constants.GRID_COLS)
     pygame.draw.rect(surface, Constants.COLOR_RED,
                      (Constants.TOP_LEFT_X, Constants.TOP_LEFT_Y, Constants.PLAY_WIDTH, Constants.PLAY_HEIGHT), 5)
-    # pygame.display.update()
 
 
 def draw_current_piece_on_grid(current_piece, grid):

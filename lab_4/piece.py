@@ -9,7 +9,7 @@ class Piece(object):
         self.y = row
         self.shape = shape
         self.color = Constants.SHAPE_COLORS[Constants.SHAPES.index(shape)]
-        self.rotation = 0  # number from 0-3
+        self.rotation = 0
 
 
     def convert_shape_format(self):
