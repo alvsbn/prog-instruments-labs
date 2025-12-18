@@ -44,24 +44,26 @@ def handle_player_input(current_piece, grid, run):
 
 
 def handle_single_keypress(event, current_piece, grid):
-    if event.key == pygame.K_LEFT:
-        current_piece.x -= 1
-        if not current_piece.valid_space(grid):
-            current_piece.x += 1
-
-    elif event.key == pygame.K_RIGHT:
-        current_piece.x += 1
-        if not current_piece.valid_space(grid):
+    match event.key:
+        case pygame.K_LEFT:
             current_piece.x -= 1
-    elif event.key == pygame.K_UP:
-        current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
-        if not current_piece.valid_space(grid):
-            current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+            if not current_piece.valid_space(grid):
+                current_piece.x += 1
 
-    if event.key == pygame.K_DOWN:
-        current_piece.y += 1
-        if not current_piece.valid_space(grid):
-            current_piece.y -= 1
+        case pygame.K_RIGHT:
+            current_piece.x += 1
+            if not current_piece.valid_space(grid):
+                current_piece.x -= 1
+
+        case pygame.K_UP:
+            current_piece.rotation = (current_piece.rotation + 1) % len(current_piece.shape)
+            if not current_piece.valid_space(grid):
+                current_piece.rotation = (current_piece.rotation - 1) % len(current_piece.shape)
+
+        case pygame.K_DOWN:
+            current_piece.y += 1
+            if not current_piece.valid_space(grid):
+                current_piece.y -= 1
 
 
 def lock_piece_to_grid(shape_pos, current_piece, locked_positions, next_piece, grid, score):
