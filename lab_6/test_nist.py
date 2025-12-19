@@ -1,4 +1,5 @@
 import pytest
+
 from nist import frequency_bit_test, identical_consecutive_bits_test, longest_sequence_of_ones_test
 
 
@@ -70,4 +71,5 @@ def test_frequency_bit_test_with_mock_and_args(monkeypatch):
     result2 = frequency_bit_test("10")
 
     assert result1 == 0.60
+
     assert result2 == 0.60
