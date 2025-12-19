@@ -1,80 +1,73 @@
-import math
-
-from scipy.special import gammainc
-
-
-def frequency_bit_test(sequence: str) -> float:
-    """
-    Frequency bit test
-    :param sequence: bit sequence
-    :return: p-value
-    """
-    n = len(sequence)
-    x = 0
-    for i in sequence:
-        match i:
-            case '1':
-                x += 1
-            case '0':
-                x += -1
-
-    s_n = abs(x) / math.sqrt(n)
-    p_value = math.erfc(s_n / math.sqrt(2))
-    return p_value
+import pytest
+from nist import frequency_bit_test, identical_consecutive_bits_test, longest_sequence_of_ones_test
 
 
-def identical_consecutive_bits_test(sequence: str) -> float:
-    """
-    Test for identical consecutive bits
-    :param sequence: bit sequence
-    :return: p-value
-    """
-    n = len(sequence)
-    zeta = sequence.count('1') / n
+@pytest.mark.parametrize("sequence, description", [
+    ("01" * 64, "чередование 01"),
+    ("10" * 64, "чередование 10"),
+    ("1" * 128, "все единицы"),
+    ("0" * 128, "все нули"),
+])
+def test_frequency_bit_test_basic(sequence: str, description: str):
+    result = frequency_bit_test(sequence)
+    assert 0 <= result <= 1
 
-    if abs(zeta - 0.5) >= (2 / math.sqrt(n)):
-        return 0.0
-    else:
-        v_n = sum(1 for i in range(n - 1) if sequence[i] != sequence[i + 1])
-        p_value = math.erfc(abs(v_n - 2 * n * zeta * (1 - zeta)) / (2 * math.sqrt(2 * n) * zeta * (1 - zeta)))
-        return p_value
+    if "все единицы" in description or "все нули" in description:
+        assert result < 0.1
+    elif "чередование" in description:
+        assert result > 0.01
 
 
-def longest_sequence_of_ones_test(sequence: str, pi: list, m: int) -> float:
-    """
-    Test for the longest sequence of ones in a block
-    :param sequence: bit sequence
-    :param pi: list of probabilities
-    :param m: block size
-    :return: p-value
-    """
-    v = [0, 0, 0, 0]
+def test_frequency_bit_test_single_bit():
+    result1 = frequency_bit_test("1")
+    result0 = frequency_bit_test("0")
+    assert 0 <= result1 <= 1
+    assert 0 <= result0 <= 1
 
-    blocks = [sequence[i:i + m] for i in range(0, len(sequence), m)]
 
-    for block in blocks:
-        counter = 0
-        ones_count = 0
+def test_identical_consecutive_bits_test_all_ones():
+    sequence = "1" * 128
+    p_value = identical_consecutive_bits_test(sequence)
+    assert p_value == 0.0
 
-        for i in block:
-            if i == '1':
-                counter += 1
-                ones_count = max(ones_count, counter)
-            else:
-                counter = 0
-        match ones_count:
-            case 0 | 1:
-                v[0] += 1
-            case 2:
-                v[1] += 1
-            case 3:
-                v[2] += 1
-            case _:
-                v[3] += 1
 
-    chi_square = 0
-    for i in range(0, 4):
-        chi_square += (((v[i] - 16 * pi[i]) ** 2) / (16 * pi[i]))
+def test_identical_consecutive_bits_test_alternating():
+    sequence = "01" * 64
+    p_value = identical_consecutive_bits_test(sequence)
+    assert p_value < 0.01
 
-    p_value = gammainc(3 / 2, chi_square / 2)
-    return p_value
+
+def test_longest_all_sequence_of_ones_zeros():
+    sequence = "0" * 128
+    pi = [0.2148, 0.3672, 0.2305, 0.1875]
+    p = longest_sequence_of_ones_test(sequence, pi, 8)
+    assert 0.0 <= p <= 1.0
+
+
+def test_longest_sequence_of_ones_all_ones():
+    sequence = "1" * 128
+    pi = [0.2148, 0.3672, 0.2305, 0.1875]
+    p = longest_sequence_of_ones_test(sequence, pi, 8)
+    assert 0.0 <= p <= 1.0
+
+
+def test_longest_sequence_of_ones_test_alternating():
+    sequence = "01" * 64
+    pi = [0.2148, 0.3672, 0.2305, 0.1875]
+    p = longest_sequence_of_ones_test(sequence, pi, 8)
+    assert 0.0 <= p <= 1.0
+
+
+def test_frequency_bit_test_with_mock_and_args(monkeypatch):
+    captured_args = []
+    def mock_erfc(x):
+        captured_args.append(x)
+        return 0.60
+
+    monkeypatch.setattr("nist.math.erfc", mock_erfc)
+
+    result1 = frequency_bit_test("01")
+    result2 = frequency_bit_test("10")
+
+    assert result1 == 0.60
+    assert result2 == 0.60
